@@ -1,0 +1,33 @@
+{%extends 'base.html'%}
+
+
+
+
+
+
+
+
+{%block main_block%}
+
+
+<div class="container mt-5 bg-secondary p-3">
+
+    <h1 class="text-center">Task Form Table</h1>
+    <div class="row">
+        <div class="col-3"></div>
+        <div class="col-6">
+            <form action="" method="post">
+                {%csrf_token%}
+                {{form}}
+
+                <button type="submit">add</button>
+
+            </form>
+
+        </div>
+        <div class="col-3"></div>
+    </div>
+
+</div>
+
+{%endblock%}
