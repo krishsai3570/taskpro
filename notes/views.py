@@ -2,13 +2,17 @@ from django.shortcuts import render,redirect
 
 from django.views.generic import View
 
-from notes.forms import TaskForm
+from notes.forms import TaskForm,RegistrationForm,SignInForm
 
 from notes.models import Task
 
 from django.contrib import messages
 
 from django import forms
+
+from django.contrib.auth.models import User
+
+from django.contrib.auth import authenticate,login,logout
 
 
 
@@ -25,12 +29,14 @@ class TaskCreateView(View):
 
         form_instance=TaskForm(request.POST)
 
-        if form_instance.is_valid():     
-            # data=form_instance.changed_data
+        if form_instance.is_valid():  
 
-            # qs=Task.objects.create(**data)
+            form_instance.instance.user=request.user   
+           
 
             form_instance.save()
+
+
 
             messages.success(request,"task has been added")
 
@@ -127,3 +133,81 @@ class TaskSummaryView(View):
         
 
         
+class SignUpView(View):
+    def get(self,request,*args,**kwargs):
+
+        form_instance=RegistrationForm()
+
+        return render(request,"register.html",{"form":form_instance})
+    
+
+    
+    
+    def post(self,request,*args,**kwargs):
+
+        form_instance=RegistrationForm(request.POST)
+
+        if form_instance.is_valid():
+          
+          
+
+          data=form_instance.cleaned_data
+
+
+          User.objects.create_user(**data)
+
+          return redirect("task-list")
+        else:
+            return render(request,"register.html",{"form":form_instance})
+    
+
+
+class SignInView(View):
+    def get(self,request,*args,**kwargs):
+         
+        form_instance=SignInForm()
+
+        return render(request,"login.html",{"form":form_instance})
+    
+
+    def post(self,request,*args,**kwargs):
+
+        form_instance=SignInForm(request.POST)
+
+        if form_instance.is_valid():
+
+            username=form_instance.cleaned_data.get("username")
+
+            password=form_instance.cleaned_data.get("password")
+
+
+            user_object=authenticate(request,username=username,password=password)
+
+            if user_object:
+
+                login(request,user_object)
+
+                return redirect("task-list")
+            
+        else:
+            return render(request,"login.html",{"form":form_instance})
+        
+
+
+
+class SignOutView(View):
+    def get(self,request,*args,**kwargs):
+
+        logout(request)    
+
+        return redirect("sign-in")    
+
+
+    
+
+
+     
+
+
+         
+
